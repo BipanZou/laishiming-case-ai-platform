@@ -1,0 +1,18 @@
+# macOS
+.DS_Store
+._*
+
+# 备份目录（不上传 v1 静态版本）
+apps_v1_static_backup/
+
+# 截图目录（仅本地查看）
+screenshots/
+
+# 工具临时文件
+.claude/
+launch.json
+*.log
+*.tmp
+
+# 旧 v1 框架图（如果还存在）
+apps/00_FrameworkOverview.html.bak

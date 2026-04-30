@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据驱动注塑排产优化 · AI教学平台</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'PingFang SC', 'Microsoft YaHei', '宋体', SimSun, serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 100vh;
+    color: #1e293b;
+    padding: 30px 20px;
+  }
+  .container { max-width: 1280px; margin: 0 auto; }
+
+  /* 头部 */
+  .header {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    color: white;
+    padding: 36px 40px;
+    border-radius: 18px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(30, 41, 59, 0.15);
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, transparent 70%);
+  }
+  .header-tag {
+    display: inline-block;
+    background: rgba(245, 158, 11, 0.25);
+    color: #fbbf24;
+    padding: 4px 14px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+  }
+  .header h1 {
+    font-size: 28px; font-weight: 800;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  .header h2 {
+    font-size: 18px; font-weight: 400;
+    color: #cbd5e1;
+    margin-bottom: 18px;
+  }
+  .header-subtitle {
+    font-size: 14px; color: #94a3b8;
+    line-height: 1.7;
+    max-width: 720px;
+  }
+  .header-meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .meta-item b { color: #fbbf24; }
+
+  /* 框架总览卡片（特殊） */
+  .framework-card {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #f59e0b;
+    padding: 22px 28px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+  }
+  .framework-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
+  }
+  .framework-card .icon-large { font-size: 48px; }
+  .framework-card h3 {
+    font-size: 18px; font-weight: 700;
+    color: #b45309;
+    margin-bottom: 4px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .framework-card .label-tag {
+    background: #b45309; color: white;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .framework-card p {
+    font-size: 13.5px; color: #78350f;
+    line-height: 1.6;
+  }
+  .framework-card .arrow {
+    background: #b45309; color: white;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 700;
+  }
+
+  /* 七个 App 网格 */
+  .grid-title {
+    font-size: 16px; font-weight: 700;
+    color: #475569;
+    margin-bottom: 14px;
+    padding-left: 4px;
+    border-left: 4px solid #3b82f6;
+    padding-left: 12px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+    margin-bottom: 30px;
+  }
+
+  /* App 卡片 */
+  .app-card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  .app-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 4px;
+    background: var(--card-color);
+  }
+  .app-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    border-color: var(--card-color);
+  }
+
+  .app-card-stage {
+    font-size: 11px; color: #94a3b8;
+    font-weight: 600; letter-spacing: 1.5px;
+    margin-bottom: 4px;
+  }
+  .app-card-icon {
+    font-size: 36px;
+    margin-bottom: 8px;
+    line-height: 1;
+  }
+  .app-card-title {
+    font-size: 18px; font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 4px;
+    display: flex; align-items: baseline; gap: 8px;
+    flex-wrap: wrap;
+  }
+  .app-card-title .en {
+    font-size: 13px; color: var(--card-color);
+    font-weight: 600;
+  }
+  .app-card-cn {
+    font-size: 13.5px; color: #475569;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .app-card-features {
+    font-size: 12px; color: #64748b;
+    line-height: 1.7;
+    flex: 1;
+  }
+  .app-card-features .feature {
+    display: flex; gap: 6px; align-items: flex-start;
+  }
+  .app-card-features .feature::before {
+    content: '✓'; color: var(--card-color);
+    font-weight: 700; font-size: 13px;
+    flex-shrink: 0;
+  }
+  .app-card-cta {
+    margin-top: 14px;
+    display: flex; align-items: center; gap: 6px;
+    color: var(--card-color);
+    font-size: 13px; font-weight: 600;
+  }
+  .app-card-cta::after {
+    content: '→';
+    transition: transform 0.2s;
+  }
+  .app-card:hover .app-card-cta::after {
+    transform: translateX(4px);
+  }
+
+  /* 底部说明 */
+  .footer {
+    background: white;
+    border-radius: 14px;
+    padding: 24px 28px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .footer-section h4 {
+    font-size: 14px; color: #1e293b;
+    margin-bottom: 10px;
+    font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .footer-section p, .footer-section li {
+    font-size: 12.5px; color: #475569;
+    line-height: 1.8;
+  }
+  .footer-section ul { list-style: none; padding-left: 0; }
+  .footer-section ul li::before {
+    content: '·'; margin-right: 8px;
+    color: #f59e0b; font-weight: 700;
+  }
+  .citation {
+    grid-column: 1 / -1;
+    background: #f8fafc;
+    border-left: 3px solid #3b82f6;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #475569;
+    line-height: 1.7;
+  }
+  .citation b { color: #1e293b; }
+
+  /* 卡片颜色 */
+  .c-1 { --card-color: #dc2626; }
+  .c-2 { --card-color: #2563eb; }
+  .c-3 { --card-color: #7c3aed; }
+  .c-4 { --card-color: #0d9488; }
+  .c-5 { --card-color: #db2777; }
+  .c-6 { --card-color: #ea580c; }
+  .c-7 { --card-color: #059669; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- 头部 -->
+<div class="header">
+  <div class="header-tag">📚 案例配套教学支持材料</div>
+  <h1>数据驱动注塑排产优化 · AI 教学平台</h1>
+  <h2>莱势明汽车饰件案例 · 7 个真实可运行的 AI Web 应用</h2>
+  <p class="header-subtitle">
+    本平台为「数据驱动注塑排产优化：莱势明汽车饰件的智能制造实践」案例的配套教学支持材料，
+    包含 7 个由 AI 技术驱动的真实可运行 Web 应用，覆盖"诊断 → 数据 → 建模 → 学习 → 算法 → 决策 → 评估"完整教学链条。
+    所有应用支持<b style="color: #fbbf24;">完全离线运行</b>，双击任一卡片即可在浏览器中体验。
+  </p>
+  <div class="header-meta">
+    <div class="meta-item">📦 应用数量 <b>7 个</b></div>
+    <div class="meta-item">🌐 运行环境 <b>浏览器（无需安装）</b></div>
+    <div class="meta-item">📡 网络要求 <b>完全离线可用</b></div>
+    <div class="meta-item">🎓 适用对象 <b>MBA/EMBA · 本科生</b></div>
+  </div>
+</div>
+
+<!-- 框架总览卡 -->
+<a class="framework-card" href="apps/00_FrameworkOverview.html" target="_blank">
+  <div>
+    <h3>
+      <span class="icon-large">🗺️</span>
+      AI 教学框架全景图
+      <span class="label-tag">推荐先看</span>
+    </h3>
+    <p>
+      系统呈现「7个AI工具的完整教学链条」——
+      七大阶段 × 理论基础 × AI Web App × 核心输出 的四层信息架构。
+      建议在使用具体 App 之前，先浏览此总览以建立全局认知。
+    </p>
+  </div>
+  <div class="arrow">→</div>
+</a>
+
+<!-- 七个 App 网格 -->
+<div class="grid-title">🚀 七个 AI Web 应用（按教学顺序）</div>
+
+<div class="grid">
+
+  <!-- 1. DiagnosePilot -->
+  <a class="app-card c-1" href="apps/06_DiagnosePilot.html" target="_blank">
+    <div class="app-card-stage">STAGE 1 · 诊断</div>
+    <div class="app-card-icon">🩺</div>
+    <div class="app-card-title">DiagnosePilot</div>
+    <div class="app-card-cn">排产健康度 AI 诊断仪表板</div>
+    <div class="app-card-features">
+      <div class="feature">5 维度健康度雷达图</div>
+      <div class="feature">行业对标分析（n=47）</div>
+      <div class="feature">改进 ROI 排序</div>
+    </div>
+    <div class="app-card-cta">立即体验</div>
+  </a>
+
+  <!-- 2. DataPilot -->
+  <a class="app-card c-2" href="apps/01_DataPilot.html" target="_blank">
+    <div class="app-card-stage">STAGE 2 · 数据治理</div>
+    <div class="app-card-icon">📊</div>
+    <div class="app-card-title">DataPilot</div>
+    <div class="app-card-cn">排产数据治理 AI 助手</div>
+    <div class="app-card-features">
+      <div class="feature">孤立森林异常检测</div>
+      <div class="feature">KNN/GAN 智能补全</div>
+      <div class="feature">LLM 自动特征工程</div>
+    </div>
+    <div class="app-card-cta">立即体验</div>
+  </a>
+
+  <!-- 3. ModelTutor -->
+  <a class="app-card c-3" href="apps/02_ModelTutor.html" target="_blank">
+    <div class="app-card-stage">STAGE 3 · 数学建模</div>
+    <div class="app-card-icon">📐</div>
+    <div class="app-card-title">ModelTutor</div>
+    <div class="app-card-cn">AI 运筹建模助教（无需写代码）</div>
+    <div class="app-card-features">
+      <div class="feature">自然语言 → MIP 模型</div>
+      <div class="feature">对话式学习建模</div>
+      <div class="feature">自动生成约束族</div>
+    </div>
+    <div class="app-card-cta">立即体验</div>
+  </a>
+
+  <!-- 4. ParamLab -->
+  <a class="app-card c-4" href="apps/04_ParamLab.html" target="_blank">
+    <div class="app-card-stage">STAGE 4 · 参数学习</div>
+    <div class="app-card-icon">🧠</div>
+    <div class="app-card-title">ParamLab</div>
+    <div class="app-card-cn">AI 参数学习实验台</div>
+    <div class="app-card-features">
+      <div class="feature">三方法估计对比（KDE/RF/XGB）</div>
+      <div class="feature">SHAP 可解释性瀑布图</div>
+      <div class="feature">误差从 ±42% 降至 ±9%</div>
+    </div>
+    <div class="app-card-cta">立即体验</div>
+  </a>
+
+  <!-- 5. AlgoLab -->
+  <a class="app-card c-5" href="apps/05_AlgoLab.html" target="_blank">
+    <div class="app-card-stage">STAGE 5 · 算法求解</div>
+    <div class="app-card-icon">⚡</div>
+    <div class="app-card-title">AlgoLab</div>
+    <div class="app-card-cn">智能优化算法实验台</div>
+    <div class="app-card-features">
+      <div class="feature">实时演化曲线</div>
+      <div class="feature">超参数交互式调优</div>
+      <div class="feature">4 种算法对比</div>
+    </div>
+    <div class="app-card-cta">立即体验</div>
+  </a>
+
+  <!-- 6. SchedulePilot -->
+  <a class="app-card c-6" href="apps/03_SchedulePilot.html" target="_blank">
+    <div class="app-card-stage">STAGE 6 · 人机决策</div>
+    <div class="app-card-icon">📅</div>
+    <div class="app-card-title">SchedulePilot</div>
+    <div class="app-card-cn">AI 排产决策智能助手</div>
+    <div class="app-card-features">
+      <div class="feature">自然语言报告生成</div>
+      <div class="feature">What-If 情景模拟</div>
+      <div class="feature">决策可解释性对话</div>
+    </div>
+    <div class="app-card-cta">立即体验</div>
+  </a>
+
+  <!-- 7. ROILab -->
+  <a class="app-card c-7" href="apps/07_ROILab.html" target="_blank">
+    <div class="app-card-stage">STAGE 7 · 价值评估</div>
+    <div class="app-card-icon">💰</div>
+    <div class="app-card-title">ROILab</div>
+    <div class="app-card-cn">数据驱动排产 ROI 仿真器</div>
+    <div class="app-card-features">
+      <div class="feature">6 维度滑块实时测算</div>
+      <div class="feature">三方案 NPV 对比</div>
+      <div class="feature">敏感性 Tornado 图</div>
+    </div>
+    <div class="app-card-cta">立即体验</div>
+  </a>
+
+</div>
+
+<!-- 底部说明 -->
+<div class="footer">
+  <div class="footer-grid">
+
+    <div class="footer-section">
+      <h4>🎯 教学定位</h4>
+      <ul>
+        <li><b>MBA/EMBA</b>：以 DiagnosePilot 与 ROILab 为重点，培养"问题诊断 + 决策评估"能力</li>
+        <li><b>本科生</b>：以 DataPilot/ModelTutor/ParamLab/AlgoLab 为重点，培养"建模 + 算法"能力</li>
+        <li><b>共用</b>：SchedulePilot 展示人机协同决策模式</li>
+      </ul>
+    </div>
+
+    <div class="footer-section">
+      <h4>📚 课程对接</h4>
+      <ul>
+        <li>《数智时代下的智能决策优化》（MBA）</li>
+        <li>《运营管理》《供应链管理》（本科）</li>
+        <li>《运筹学》《管理科学》（本科）</li>
+        <li>对应中国管理案例共享中心《第十七届"全国百篇优秀管理案例"》<br>
+          课程选题 13-1/13-2/8-3/10-4</li>
+      </ul>
+    </div>
+
+    <div class="citation">
+      <b>📖 案例引用</b><br>
+      邹碧攀, 曹丽莉, 赵雁. (2026). 数据驱动注塑排产优化：莱势明汽车饰件的智能制造实践 [教学案例].
+      中南财经政法大学工商管理学院 管理案例研究中心.<br>
+      <b>🛠️ 配套平台引用</b>: Zou et al. (2026). Data-Driven Injection Molding Scheduling: An AI-Empowered Teaching Platform.
+      <a href="https://github.com/BipanZou/laishiming-case-ai-platform" target="_blank" style="color: #2563eb;">GitHub Repository</a> ·
+      <a href="https://bipanzou.github.io/laishiming-case-ai-platform/" target="_blank" style="color: #2563eb;">在线演示</a>
+    </div>
+
+  </div>
+</div>
+
+</div>
+
+</body>
+</html>
