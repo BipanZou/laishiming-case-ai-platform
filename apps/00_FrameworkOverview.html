@@ -1,527 +1,584 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>数据驱动注塑排产优化的AI教学框架全景</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>FrameworkOverview · 莱势明 AI 排产教学平台 · 完整教学链条总览</title>
+<meta name="author" content="邹碧攀 · 中南财经政法大学工商管理学院">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'PingFang SC', 'Microsoft YaHei', '宋体', SimSun, serif;
-    background: white;
-    color: #1e293b;
-    padding: 22px 28px;
-  }
+:root{
+  --c-primary:#1F4E79; --c-primary-light:#2E75B6; --c-primary-dark:#0F2D4D;
+  --c-accent:#C00000; --c-accent-2:#BF8F00; --c-accent-3:#385723; --c-accent-4:#7030A0;
+  --c-bg:#F4F7FB; --c-card:#FFFFFF; --c-border:#D9E1F2; --c-text:#1A1A1A; --c-muted:#666;
+  --c-success:#00A651;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.04); --shadow-md:0 2px 8px rgba(0,0,0,0.08); --shadow-lg:0 8px 24px rgba(0,0,0,0.12);
+  --radius-md:10px; --radius-lg:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{font-family:-apple-system,"PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif;background:var(--c-bg);color:var(--c-text);font-size:14px;line-height:1.55;}
+a{color:var(--c-primary);text-decoration:none;}
+button{font-family:inherit;cursor:pointer;border:none;outline:none;}
 
-  .header {
-    text-align: center;
-    margin-bottom: 22px;
-    padding-bottom: 18px;
-    border-bottom: 3px solid #1e293b;
-  }
-  .title {
-    font-size: 24px; font-weight: 800; color: #0f172a;
-    margin-bottom: 6px;
-  }
-  .subtitle {
-    font-size: 14px; color: #475569;
-    font-style: italic;
-  }
-  .subtitle b { color: #b45309; font-style: normal; }
+.topbar{background:linear-gradient(135deg,var(--c-primary) 0%,var(--c-primary-dark) 100%);color:#fff;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-md);position:sticky;top:0;z-index:100;}
+.topbar-left{display:flex;align-items:center;gap:14px;}
+.topbar-logo{width:42px;height:42px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold;}
+.topbar-title{font-size:17px;font-weight:600;letter-spacing:0.5px;}
+.topbar-subtitle{font-size:11.5px;opacity:0.85;margin-top:2px;}
+.topbar-right{display:flex;align-items:center;gap:14px;font-size:12.5px;opacity:0.9;}
+.topbar-tag{padding:3px 10px;background:rgba(255,255,255,0.15);border-radius:12px;font-size:11px;}
 
-  /* 三层框架 */
-  .framework-row {
-    display: grid;
-    grid-template-columns: 110px repeat(7, 1fr);
-    gap: 4px;
-    align-items: stretch;
-    margin-bottom: 6px;
-  }
+.layout{max-width:1400px;margin:0 auto;padding:14px;}
 
-  .row-label {
-    font-size: 12.5px; font-weight: 700;
-    color: white;
-    padding: 12px 8px;
-    border-radius: 8px;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    text-align: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  }
-  .row-label .num {
-    font-size: 20px; margin-bottom: 4px;
-    opacity: 0.9;
-  }
+.hero{background:linear-gradient(135deg,#E1ECF7 0%,#F0F4F9 100%);border-radius:var(--radius-lg);padding:28px 32px;margin-bottom:20px;}
+.hero h1{font-size:26px;color:var(--c-primary-dark);margin-bottom:6px;letter-spacing:0.5px;}
+.hero p{font-size:14px;color:#444;line-height:1.7;margin-bottom:10px;}
+.hero-stats{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;}
+.hero-stat{padding:10px 18px;background:rgba(255,255,255,0.8);border-radius:8px;border:1px solid var(--c-border);min-width:130px;}
+.hero-stat .lab{font-size:11px;color:var(--c-muted);}
+.hero-stat .v{font-size:22px;font-weight:700;color:var(--c-primary);margin-top:2px;}
 
-  /* 颜色编码 */
-  .stage-1 { --c: #dc2626; --bg: #fef2f2; --border: #fecaca; }
-  .stage-2 { --c: #2563eb; --bg: #eff6ff; --border: #bfdbfe; }
-  .stage-3 { --c: #7c3aed; --bg: #faf5ff; --border: #ddd6fe; }
-  .stage-4 { --c: #0d9488; --bg: #f0fdfa; --border: #99f6e4; }
-  .stage-5 { --c: #db2777; --bg: #fdf2f8; --border: #fbcfe8; }
-  .stage-6 { --c: #ea580c; --bg: #fff7ed; --border: #fed7aa; }
-  .stage-7 { --c: #059669; --bg: #ecfdf5; --border: #a7f3d0; }
+.card{background:var(--c-card);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);border:1px solid var(--c-border);overflow:hidden;}
+.card-head{padding:12px 16px;background:linear-gradient(135deg,#F8FAFD 0%,#EEF3FA 100%);border-bottom:1px solid var(--c-border);display:flex;align-items:center;justify-content:space-between;}
+.card-head-title{font-size:15px;font-weight:600;color:var(--c-primary);display:flex;align-items:center;gap:8px;}
+.card-head-title .icon{display:inline-block;width:22px;height:22px;background:var(--c-primary);color:#fff;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;}
+.card-body{padding:16px 18px;}
 
-  .stage-card {
-    background: var(--bg);
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 8px;
-    text-align: center;
-    position: relative;
-    transition: all 0.2s;
-  }
-  .stage-card.stage-header {
-    background: var(--c);
-    border-color: var(--c);
-    color: white;
-    padding: 12px 8px;
-  }
+.section{margin-bottom:22px;}
 
-  .stage-icon {
-    font-size: 30px;
-    margin-bottom: 4px;
-    line-height: 1;
-  }
-  .stage-num {
-    font-size: 11px; font-weight: 600;
-    opacity: 0.85;
-    letter-spacing: 1px;
-  }
-  .stage-title {
-    font-size: 14px; font-weight: 700;
-    margin-top: 4px;
-  }
+/* 7 步链条 - 横向 */
+.chain-wrapper{overflow-x:auto;padding:8px 4px;}
+.chain{display:flex;align-items:stretch;gap:6px;min-width:1100px;}
+.chain-step{flex:1;padding:14px 12px;background:#fff;border:2px solid;border-radius:10px;text-align:center;transition:all 0.2s;cursor:pointer;min-width:140px;}
+.chain-step:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);}
+.chain-step .seq{display:inline-block;width:30px;height:30px;background:#fff;border-radius:50%;line-height:30px;font-weight:bold;border:2px solid;margin-bottom:8px;font-size:14px;}
+.chain-step .app{font-size:15px;font-weight:700;margin-top:4px;}
+.chain-step .name{font-size:12px;color:#666;margin-top:3px;line-height:1.5;}
+.chain-step .stage{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;}
+.chain-arrow{display:flex;align-items:center;color:var(--c-primary);font-size:24px;font-weight:bold;}
 
-  /* 理论层 */
-  .theory-content {
-    font-size: 11px;
-    line-height: 1.45;
-    color: #475569;
-  }
-  .theory-content b {
-    color: var(--c);
-    display: block;
-    font-size: 11.5px;
-    margin-bottom: 3px;
-  }
-  .theory-content .author {
-    font-size: 9.5px;
-    color: #94a3b8;
-    font-style: italic;
-    margin-top: 3px;
-  }
+/* 应用网格 */
+.apps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;}
+.app-card{padding:16px;background:var(--c-card);border:1px solid var(--c-border);border-radius:var(--radius-md);transition:all 0.2s;text-decoration:none;color:inherit;display:block;cursor:pointer;position:relative;}
+.app-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--c-primary-light);}
+.app-card .corner-num{position:absolute;top:14px;right:14px;font-size:24px;font-weight:bold;opacity:0.15;}
+.app-card .icon{font-size:28px;}
+.app-card h3{font-size:16px;margin-top:8px;color:var(--c-primary);display:flex;align-items:center;gap:8px;}
+.app-card .ver{display:inline-block;padding:1px 6px;background:#00A651;color:#fff;font-size:9px;border-radius:8px;font-weight:bold;}
+.app-card .stage{display:inline-block;padding:1px 8px;background:#EEF3FA;color:var(--c-primary);font-size:10px;border-radius:8px;}
+.app-card .full-name{font-size:12.5px;color:var(--c-muted);margin-top:4px;}
+.app-card .features{font-size:11.5px;color:#444;line-height:1.6;margin-top:8px;}
+.app-card .audience{font-size:10.5px;color:var(--c-muted);margin-top:6px;}
+.app-card .actions{margin-top:10px;}
+.app-card .btn-go{display:inline-block;padding:6px 12px;background:var(--c-primary);color:#fff;font-size:12px;font-weight:600;border-radius:5px;}
+.app-card .btn-go:hover{background:var(--c-primary-dark);}
 
-  /* 工具层 */
-  .tool-card {
-    background: white;
-    border: 2px solid var(--c);
-    border-radius: 10px;
-    padding: 10px 6px;
-    text-align: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.06);
-  }
-  .tool-name {
-    font-size: 13px; font-weight: 700;
-    color: var(--c);
-    margin-bottom: 4px;
-  }
-  .tool-cn {
-    font-size: 10.5px;
-    color: #475569;
-    line-height: 1.3;
-  }
-  .tool-fig {
-    display: inline-block;
-    background: var(--c);
-    color: white;
-    padding: 2px 8px;
-    border-radius: 8px;
-    font-size: 10px;
-    font-weight: 600;
-    margin-top: 6px;
-  }
+/* 教学场景表格 */
+.scene-table{width:100%;border-collapse:collapse;font-size:13px;}
+.scene-table th{background:var(--c-primary);color:#fff;padding:8px 12px;text-align:left;font-weight:600;}
+.scene-table td{padding:10px 12px;border-bottom:1px solid var(--c-border);vertical-align:top;}
+.scene-table tr:nth-child(even){background:#F8FAFD;}
+.scene-table td.time{font-weight:600;color:var(--c-primary);width:90px;white-space:nowrap;}
+.scene-table td.app{font-weight:600;color:var(--c-accent-4);}
+.scene-table .badge-app{display:inline-block;padding:2px 8px;background:#EEF3FA;color:var(--c-primary);font-size:11px;border-radius:10px;margin-right:4px;}
 
-  /* 输出层 */
-  .output-content {
-    background: var(--bg);
-    border: 1px dashed var(--c);
-    border-radius: 8px;
-    padding: 8px 6px;
-    text-align: center;
-    font-size: 10.5px;
-    color: #1e293b;
-    line-height: 1.4;
-  }
-  .output-content .arrow {
-    display: block; font-size: 13px;
-    margin-bottom: 2px; color: var(--c);
-  }
-  .output-content b {
-    color: var(--c);
-    font-size: 11px;
-  }
+/* 理论卡片 */
+.theory-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;}
+.theory-card{padding:14px;background:#FFF9E6;border-left:4px solid var(--c-accent-2);border-radius:6px;}
+.theory-card h4{font-size:13px;color:var(--c-primary);margin-bottom:6px;}
+.theory-card p{font-size:11.5px;color:#444;line-height:1.7;}
+.theory-card .ref{font-size:10.5px;color:var(--c-muted);font-style:italic;margin-top:6px;}
 
-  /* 流向箭头 */
-  .arrow-flow {
-    display: grid;
-    grid-template-columns: 110px repeat(13, 1fr);
-    align-items: center;
-    margin: 4px 0;
-    height: 26px;
-  }
-  .arrow-flow > div { text-align: center; }
-  .flow-arrow {
-    color: #94a3b8;
-    font-size: 16px;
-    font-weight: 700;
-  }
-  .flow-step {
-    color: #475569;
-    font-size: 10.5px;
-    background: #f1f5f9;
-    border-radius: 4px;
-    padding: 2px 6px;
-    border: 1px solid #cbd5e1;
-    font-weight: 500;
-  }
+/* 课程对接 */
+.course-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+.course-card{padding:12px 14px;background:#fff;border:1px solid var(--c-border);border-radius:8px;}
+.course-card h4{font-size:13px;color:var(--c-primary);margin-bottom:4px;}
+.course-card p{font-size:11px;color:var(--c-muted);}
+.course-card .level{display:inline-block;padding:2px 6px;background:#EEF3FA;color:var(--c-primary);font-size:9.5px;font-weight:600;border-radius:8px;margin-bottom:4px;}
 
-  /* 底部说明栏 */
-  .footer {
-    margin-top: 18px;
-    background: linear-gradient(90deg, #1e293b 0%, #334155 50%, #475569 100%);
-    color: white;
-    padding: 16px 22px;
-    border-radius: 10px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 24px;
-  }
-  .footer-item h4 {
-    font-size: 12.5px; color: #fbbf24;
-    margin-bottom: 6px;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .footer-item p {
-    font-size: 11.5px;
-    line-height: 1.55;
-    color: #e2e8f0;
-  }
-  .footer-item b { color: white; }
+/* 资源 grid */
+.res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
+.res-card{padding:14px;background:#fff;border:1px solid var(--c-border);border-radius:8px;transition:all 0.15s;text-decoration:none;color:inherit;display:flex;align-items:center;gap:10px;}
+.res-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-sm);border-color:var(--c-primary-light);}
+.res-card .res-icon{font-size:28px;}
+.res-card .res-info h4{font-size:13px;color:var(--c-primary);}
+.res-card .res-info p{font-size:11px;color:var(--c-muted);margin-top:2px;}
 
-  /* 主章节标签 */
-  .stage-axis {
-    display: grid;
-    grid-template-columns: 110px repeat(7, 1fr);
-    gap: 4px;
-    margin-bottom: 8px;
-  }
-  .axis-label {
-    font-size: 11px; font-weight: 600;
-    color: #64748b;
-    text-align: center;
-    padding: 4px 0;
-    border-top: 1px solid #cbd5e1;
-    border-bottom: 1px solid #cbd5e1;
-    background: #f8fafc;
-  }
-  .axis-label.first { background: transparent; border: none; color: #1e293b; font-weight: 700; }
+.footer{background:#FFF;border-top:1px solid var(--c-border);padding:20px;text-align:center;font-size:12px;color:var(--c-muted);margin-top:24px;}
+.footer a{color:var(--c-primary);}
 
-  .legend {
-    display: flex; justify-content: center; gap: 18px;
-    margin-top: 10px;
-    font-size: 11.5px;
-    color: #475569;
-  }
-  .legend-dot {
-    display: inline-block;
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    margin-right: 4px;
-    vertical-align: middle;
-  }
+/* tabs */
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--c-border);margin-bottom:14px;padding:0 4px;}
+.tab-btn{padding:8px 16px;font-size:13px;font-weight:600;color:var(--c-muted);background:transparent;border-bottom:3px solid transparent;margin-bottom:-2px;cursor:pointer;}
+.tab-btn.active{color:var(--c-primary);border-bottom-color:var(--c-primary);}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* 颜色映射 - 7 阶段 */
+.color-diagnose{color:#C00000;border-color:#C00000;}
+.color-data{color:#BF8F00;border-color:#BF8F00;}
+.color-model{color:#385723;border-color:#385723;}
+.color-learn{color:#385723;border-color:#385723;}
+.color-algo{color:#2E75B6;border-color:#2E75B6;}
+.color-schedule{color:#1F4E79;border-color:#1F4E79;}
+.color-roi{color:#7030A0;border-color:#7030A0;}
+
+::-webkit-scrollbar{width:8px;height:10px;}
+::-webkit-scrollbar-track{background:#F0F4F9;}
+::-webkit-scrollbar-thumb{background:#C0CBDB;border-radius:4px;}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="title">数据驱动注塑排产优化的 AI 教学框架全景</div>
-  <div class="subtitle">
-    7 个 AI 工具贯穿"<b>诊断 → 数据 → 建模 → 学习 → 算法 → 决策 → 评估</b>"完整闭环 ·
-    每个工具均有<b>经典理论支撑</b>与<b>真实Web App</b>实现
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">🗺</div>
+    <div>
+      <div class="topbar-title">FrameworkOverview · 完整教学链条总览</div>
+      <div class="topbar-subtitle">7 应用 · 14 数据表 · 6 Notebook · 11 提示词 · 7 PDF 手册 · 教学路径推荐</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-tag">00 / 07 总览</span>
+    <span class="topbar-tag">📚 教学型</span>
+    <span class="topbar-tag">🌐 离线可用</span>
+    <span>© 中南财经政法大学 邹碧攀</span>
   </div>
 </div>
 
-<!-- 章节阶段标签 -->
-<div class="stage-axis">
-  <div class="axis-label first">章节定位</div>
-  <div class="axis-label">第四章末</div>
-  <div class="axis-label">五-Step 1</div>
-  <div class="axis-label">五-Step 2</div>
-  <div class="axis-label">五-Step 3</div>
-  <div class="axis-label">五-Step 4</div>
-  <div class="axis-label">五-Step 5</div>
-  <div class="axis-label">第七章末</div>
+<div class="layout">
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1>🏭 AI 赋能数据驱动的注塑排产优化</h1>
+    <h2 style="font-size:16px;color:#444;font-weight:normal;margin-bottom:10px;">—— 莱势明 AI 排产教学平台 v2.0 Pro ——</h2>
+    <p>面向 MBA 学员与本科生学习「AI 赋能数据驱动决策」时面临的"数理、编程、机器学习、商业评估"四类高门槛，由教师作为「提示词工程师」，全栈采用 DeepSeek-V3、通义千问、智谱 GLM-4 等国产大模型驱动 AI 编程助手，4~6 周内自主开发了 7 个真实可运行的 AI Web 应用工具，覆盖"诊断—治理—建模—学习—算法—决策—评估"完整教学链条。</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="lab">AI Web 应用</div><div class="v">7</div></div>
+      <div class="hero-stat"><div class="lab">业务数据行数</div><div class="v">572,505+</div></div>
+      <div class="hero-stat"><div class="lab">业务数据表</div><div class="v">14 张</div></div>
+      <div class="hero-stat"><div class="lab">总代码量</div><div class="v">~20,000 行</div></div>
+      <div class="hero-stat"><div class="lab">PDF 文档</div><div class="v">7+ 份</div></div>
+      <div class="hero-stat"><div class="lab">Notebook</div><div class="v">6 份</div></div>
+      <div class="hero-stat"><div class="lab">提示词</div><div class="v">11 份</div></div>
+      <div class="hero-stat"><div class="lab">学员覆盖</div><div class="v">160 人</div></div>
+    </div>
+  </div>
+
+  <!-- 7 步教学链条 -->
+  <div class="card section">
+    <div class="card-head">
+      <div class="card-head-title"><span class="icon">🔗</span>7 步教学链条 · 完整教学闭环</div>
+    </div>
+    <div class="card-body">
+      <p style="font-size:13px;color:#444;margin-bottom:14px;">点击任意一步即可跳转对应应用。建议初次使用者按 ① → ⑦ 顺序体验完整闭环。</p>
+      <div class="chain-wrapper">
+        <div class="chain">
+          <a class="chain-step color-diagnose" href="06_DiagnosePilot.html">
+            <div class="seq color-diagnose">1</div>
+            <div class="stage">🩺 诊断</div>
+            <div class="app">DiagnosePilot</div>
+            <div class="name">5 维健康度</div>
+          </a>
+          <div class="chain-arrow">→</div>
+          <a class="chain-step color-data" href="01_DataPilot.html">
+            <div class="seq color-data">2</div>
+            <div class="stage">📊 治理</div>
+            <div class="app">DataPilot</div>
+            <div class="name">4 异常 + 5 填补</div>
+          </a>
+          <div class="chain-arrow">→</div>
+          <a class="chain-step color-model" href="02_ModelTutor.html">
+            <div class="seq color-model">3</div>
+            <div class="stage">📐 建模</div>
+            <div class="app">ModelTutor</div>
+            <div class="name">NL → Pyomo</div>
+          </a>
+          <div class="chain-arrow">→</div>
+          <a class="chain-step color-learn" href="04_ParamLab.html">
+            <div class="seq color-learn">4</div>
+            <div class="stage">📈 学习</div>
+            <div class="app">ParamLab</div>
+            <div class="name">4 回归 + SHAP</div>
+          </a>
+          <div class="chain-arrow">→</div>
+          <a class="chain-step color-algo" href="05_AlgoLab.html">
+            <div class="seq color-algo">5</div>
+            <div class="stage">⚡ 算法</div>
+            <div class="app">AlgoLab</div>
+            <div class="name">GA/SA/TS/ALNS</div>
+          </a>
+          <div class="chain-arrow">→</div>
+          <a class="chain-step color-schedule" href="03_SchedulePilot.html">
+            <div class="seq color-schedule">6</div>
+            <div class="stage">🎯 决策</div>
+            <div class="app">SchedulePilot</div>
+            <div class="name">6 What-If</div>
+          </a>
+          <div class="chain-arrow">→</div>
+          <a class="chain-step color-roi" href="07_ROILab.html">
+            <div class="seq color-roi">7</div>
+            <div class="stage">💰 评估</div>
+            <div class="app">ROILab</div>
+            <div class="name">NPV + MC10K</div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7 个 AI Web 应用详情 -->
+  <div class="card section">
+    <div class="card-head">
+      <div class="card-head-title"><span class="icon">📱</span>7 个 AI Web 应用详情</div>
+    </div>
+    <div class="card-body">
+      <div class="apps-grid" id="apps-grid"></div>
+    </div>
+  </div>
+
+  <!-- 教学场景推荐 -->
+  <div class="card section">
+    <div class="card-head">
+      <div class="card-head-title"><span class="icon">🎓</span>教学场景推荐</div>
+    </div>
+    <div class="card-body">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="mba90">MBA 90 分钟（聚焦版）</button>
+        <button class="tab-btn" data-tab="mba180">MBA / EMBA 180 分钟（完整版）</button>
+        <button class="tab-btn" data-tab="ugrad">本科 4 学时 + 4 学时实验</button>
+        <button class="tab-btn" data-tab="dyad">差异化对比</button>
+      </div>
+
+      <div class="tab-content active" id="t-mba90">
+        <p style="font-size:13px;color:#444;margin-bottom:10px;">⭐ 推荐用于首次接触本案例的 MBA 课堂。重点演示 DiagnosePilot、SchedulePilot、ROILab、ModelTutor 四个应用，让学员在 90 分钟内完整体验"诊断—决策—评估"管理闭环。</p>
+        <table class="scene-table">
+          <thead><tr><th>时段</th><th>内容</th><th>应用</th><th>学员产出</th></tr></thead>
+          <tbody>
+            <tr><td class="time">0–10 min</td><td>案例导入：莱势明排产困境 + 张总转型动机</td><td>—</td><td>问题清单</td></tr>
+            <tr><td class="time">10–30 min</td><td>排产健康度 AI 诊断 + 行业对标 + 7 项目 ROI 排序</td><td><span class="badge-app">DiagnosePilot</span></td><td>改进项目 Top 3</td></tr>
+            <tr><td class="time">30–55 min</td><td>6 类 What-If 场景 + 4 方案对比 + LLM 报告生成</td><td><span class="badge-app">SchedulePilot</span></td><td>决策建议书</td></tr>
+            <tr><td class="time">55–80 min</td><td>6 维 ROI 滑块 + Monte Carlo 10K 仿真 + Tornado</td><td><span class="badge-app">ROILab</span></td><td>三方案 NPV 对比</td></tr>
+            <tr><td class="time">80–90 min</td><td>小组发言：你们公司值得投这个 AI 吗？</td><td>—</td><td>3 分钟董事会汇报</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tab-content" id="t-mba180">
+        <p style="font-size:13px;color:#444;margin-bottom:10px;">适合两次连续课程（每次 90 分钟）。第一次课覆盖前 4 个 App（诊断→治理→建模→学习），重点是"问题认知 + 数据准备 + 模型构建"；第二次课覆盖后 3 个 App（算法→决策→评估）+ 综合讨论。</p>
+        <h4 style="color:var(--c-primary);margin:14px 0 8px 0;">第一次课（90 分钟）</h4>
+        <table class="scene-table">
+          <thead><tr><th>时段</th><th>内容</th><th>应用</th></tr></thead>
+          <tbody>
+            <tr><td class="time">0–25 min</td><td>排产健康度诊断 + 数据治理</td><td><span class="badge-app">DiagnosePilot</span> <span class="badge-app">DataPilot</span></td></tr>
+            <tr><td class="time">25–55 min</td><td>自然语言 → α|β|γ → MIP → Pyomo 代码</td><td><span class="badge-app">ModelTutor</span></td></tr>
+            <tr><td class="time">55–85 min</td><td>OLS / Ridge / Lasso / RF 4 算法对比 + SHAP</td><td><span class="badge-app">ParamLab</span></td></tr>
+            <tr><td class="time">85–90 min</td><td>第一次课总结 + 课后作业布置</td><td>—</td></tr>
+          </tbody>
+        </table>
+        <h4 style="color:var(--c-primary);margin:14px 0 8px 0;">第二次课（90 分钟）</h4>
+        <table class="scene-table">
+          <thead><tr><th>时段</th><th>内容</th><th>应用</th></tr></thead>
+          <tbody>
+            <tr><td class="time">0–30 min</td><td>GA / SA / TS / ALNS 4 算法 Benchmark</td><td><span class="badge-app">AlgoLab</span></td></tr>
+            <tr><td class="time">30–55 min</td><td>6 What-If 场景 + 人机协同决策</td><td><span class="badge-app">SchedulePilot</span></td></tr>
+            <tr><td class="time">55–80 min</td><td>NPV / IRR / Monte Carlo 商业价值评估</td><td><span class="badge-app">ROILab</span></td></tr>
+            <tr><td class="time">80–90 min</td><td>综合讨论 + 课程结业小组汇报</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tab-content" id="t-ugrad">
+        <p style="font-size:13px;color:#444;margin-bottom:10px;">本科课堂重点 4 个偏技术应用（Data / Model / Param / Algo），培养"建模 + 算法 + 数据"硬核能力。考核包括 Python 代码作业。</p>
+        <h4 style="color:var(--c-primary);margin:14px 0 8px 0;">课堂部分（4 学时）</h4>
+        <table class="scene-table">
+          <thead><tr><th>时段</th><th>内容</th><th>应用</th></tr></thead>
+          <tbody>
+            <tr><td class="time">第 1 学时</td><td>异常检测 4 算法 + 缺失填补 5 策略 + 特征工程</td><td><span class="badge-app">DataPilot</span></td></tr>
+            <tr><td class="time">第 2 学时</td><td>自然语言 → α|β|γ → MIP → Pyomo 代码逐行讲解</td><td><span class="badge-app">ModelTutor</span></td></tr>
+            <tr><td class="time">第 3 学时</td><td>OLS / Ridge / Lasso / RF 4 算法 + SHAP 特征解释</td><td><span class="badge-app">ParamLab</span></td></tr>
+            <tr><td class="time">第 4 学时</td><td>GA / SA / TS / ALNS 4 算法实时演化</td><td><span class="badge-app">AlgoLab</span></td></tr>
+          </tbody>
+        </table>
+        <h4 style="color:var(--c-primary);margin:14px 0 8px 0;">实验部分（4 学时）</h4>
+        <table class="scene-table">
+          <thead><tr><th>时段</th><th>内容</th><th>产出</th></tr></thead>
+          <tbody>
+            <tr><td class="time">实验 1</td><td>用 Python 复现 ParamLab 的 OLS 训练</td><td>Jupyter Notebook + 4 算法 Benchmark 报告</td></tr>
+            <tr><td class="time">实验 2</td><td>用 Pyomo 求解 30 工单 × 8 机器调度问题</td><td>Pyomo 代码 + Gantt 图</td></tr>
+            <tr><td class="time">实验 3</td><td>实现 GA / SA 算法（基于 AlgoLab 框架）</td><td>Python 代码 + 收敛分析</td></tr>
+            <tr><td class="time">实验 4</td><td>30 工单 × 8 机器调度优化综合实验报告</td><td>完整实验报告（3-5 页）</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tab-content" id="t-dyad">
+        <p style="font-size:13px;color:#444;margin-bottom:10px;">为 MBA 与本科生设计了差异化教学方案 —— 同一平台，不同侧重。</p>
+        <table class="scene-table">
+          <thead><tr><th>维度</th><th>MBA / EMBA</th><th>本科</th></tr></thead>
+          <tbody>
+            <tr><td>学员背景</td><td>制造、汽配、电子、医药等行业，平均工作 8.5 年，0 编程基础</td><td>大三 / 大四，工商管理 / 物流管理，无产业经验</td></tr>
+            <tr><td>对接课程</td><td>《数智时代下的智能决策优化》</td><td>《运营管理》《运筹学》《供应链管理》《Python 数据分析》</td></tr>
+            <tr><td>核心目标</td><td>诊断 + 决策 + 评估管理能力</td><td>建模 + 算法 + 数据硬核能力</td></tr>
+            <tr><td>重点 App</td><td>Diagnose + Schedule + ROI（3 个偏管理）</td><td>Data + Model + Param + Algo（4 个偏技术）</td></tr>
+            <tr><td>学时</td><td>90 × 2 = 4 学时</td><td>2 学时课堂 × 2 + 4 学时实验 = 8 学时</td></tr>
+            <tr><td>评估</td><td>方案 ROI 评估表 + 3 分钟董事会汇报</td><td>4 算法 Benchmark + Pyomo 代码作业</td></tr>
+            <tr><td>课后</td><td>《AI 排产可行性建议书》（2000 字）</td><td>《调度优化实验报告》+ 完整 Python 脚本</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 理论基础 -->
+  <div class="card section">
+    <div class="card-head">
+      <div class="card-head-title"><span class="icon">📚</span>理论基础（每应用对应经典文献）</div>
+    </div>
+    <div class="card-body">
+      <div class="theory-grid" id="theory-grid"></div>
+    </div>
+  </div>
+
+  <!-- 课程对接 -->
+  <div class="card section">
+    <div class="card-head">
+      <div class="card-head-title"><span class="icon">🎓</span>课程对接（适用课程）</div>
+    </div>
+    <div class="card-body">
+      <div class="course-grid">
+        <div class="course-card">
+          <div class="level">MBA / EMBA</div>
+          <h4>数智时代下的智能决策优化</h4>
+          <p>核心课程，覆盖全部 7 个应用</p>
+        </div>
+        <div class="course-card">
+          <div class="level">MBA / EMBA</div>
+          <h4>运营与供应链管理</h4>
+          <p>重点用 Diagnose / Schedule / ROI</p>
+        </div>
+        <div class="course-card">
+          <div class="level">MBA / EMBA</div>
+          <h4>数字化转型</h4>
+          <p>重点用 Diagnose / ROI</p>
+        </div>
+        <div class="course-card">
+          <div class="level">本科</div>
+          <h4>运营管理</h4>
+          <p>重点用 Diagnose / Schedule</p>
+        </div>
+        <div class="course-card">
+          <div class="level">本科</div>
+          <h4>运筹学</h4>
+          <p>重点用 ModelTutor / AlgoLab</p>
+        </div>
+        <div class="course-card">
+          <div class="level">本科</div>
+          <h4>管理科学</h4>
+          <p>重点用 ParamLab / AlgoLab</p>
+        </div>
+        <div class="course-card">
+          <div class="level">本科</div>
+          <h4>供应链管理</h4>
+          <p>重点用 DataPilot / SchedulePilot</p>
+        </div>
+        <div class="course-card">
+          <div class="level">本科 / MBA</div>
+          <h4>Python 数据分析</h4>
+          <p>所有应用配套 Notebook 复现</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 配套资源 -->
+  <div class="card section">
+    <div class="card-head">
+      <div class="card-head-title"><span class="icon">📦</span>配套资源（除 7 个 App 外）</div>
+    </div>
+    <div class="card-body">
+      <div class="res-grid">
+        <a class="res-card" href="../docs/app_manuals/01_DataPilot_使用手册.pdf">
+          <div class="res-icon">📄</div>
+          <div class="res-info">
+            <h4>7 份 PDF 手册</h4>
+            <p>每个 App 独立使用手册</p>
+          </div>
+        </a>
+        <a class="res-card" href="../notebooks/">
+          <div class="res-icon">📓</div>
+          <div class="res-info">
+            <h4>6 份 Notebook</h4>
+            <p>Python 等效代码</p>
+          </div>
+        </a>
+        <a class="res-card" href="../prompts/">
+          <div class="res-icon">💬</div>
+          <div class="res-info">
+            <h4>11 份提示词</h4>
+            <p>教学型 Prompt 全集</p>
+          </div>
+        </a>
+        <a class="res-card" href="../datasets/">
+          <div class="res-icon">📊</div>
+          <div class="res-info">
+            <h4>14 张数据表</h4>
+            <p>57 万行真实业务模拟</p>
+          </div>
+        </a>
+        <a class="res-card" href="../screenshots/">
+          <div class="res-icon">🖼</div>
+          <div class="res-info">
+            <h4>34 张截图</h4>
+            <p>PPT + 教学可视化</p>
+          </div>
+        </a>
+        <a class="res-card" href="../README.md">
+          <div class="res-icon">📖</div>
+          <div class="res-info">
+            <h4>README</h4>
+            <p>完整资源清单</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 莱势明案例背景 -->
+  <div class="card section">
+    <div class="card-head">
+      <div class="card-head-title"><span class="icon">🏭</span>莱势明案例背景</div>
+    </div>
+    <div class="card-body">
+      <div class="hero-stats">
+        <div class="hero-stat" style="background:#FFF;"><div class="lab">研究对象</div><div class="v" style="font-size:14px;">武汉莱势明汽车饰件</div></div>
+        <div class="hero-stat" style="background:#FFF;"><div class="lab">企业类型</div><div class="v" style="font-size:14px;">Tier 2 注塑供应商</div></div>
+        <div class="hero-stat" style="background:#FFF;"><div class="lab">员工规模</div><div class="v">90 人</div></div>
+        <div class="hero-stat" style="background:#FFF;"><div class="lab">年营收</div><div class="v">5,350 万元</div></div>
+        <div class="hero-stat" style="background:#FFF;"><div class="lab">注塑机数</div><div class="v">29 台</div></div>
+        <div class="hero-stat" style="background:#FFF;"><div class="lab">机器类型</div><div class="v" style="font-size:14px;">全电动/油压/双色/两板</div></div>
+        <div class="hero-stat" style="background:#FFF;"><div class="lab">SKU 数</div><div class="v">293 个</div></div>
+        <div class="hero-stat" style="background:#FFF;"><div class="lab">客户数</div><div class="v">20 家</div></div>
+        <div class="hero-stat" style="background:#FFF;"><div class="lab">主要客户</div><div class="v" style="font-size:13px;">本田 · 比亚迪 · 小鹏 · 岚图</div></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<!-- 顶部阶段标题 -->
-<div class="framework-row">
-  <div class="row-label" style="background: linear-gradient(135deg, #1e293b, #334155);">
-    <div class="num">①</div>七大阶段
-  </div>
-  <div class="stage-card stage-header stage-1">
-    <div class="stage-icon">🩺</div>
-    <div class="stage-num">STAGE 1</div>
-    <div class="stage-title">痛点诊断</div>
-  </div>
-  <div class="stage-card stage-header stage-2">
-    <div class="stage-icon">📊</div>
-    <div class="stage-num">STAGE 2</div>
-    <div class="stage-title">数据治理</div>
-  </div>
-  <div class="stage-card stage-header stage-3">
-    <div class="stage-icon">📐</div>
-    <div class="stage-num">STAGE 3</div>
-    <div class="stage-title">数学建模</div>
-  </div>
-  <div class="stage-card stage-header stage-4">
-    <div class="stage-icon">🧠</div>
-    <div class="stage-num">STAGE 4</div>
-    <div class="stage-title">参数学习</div>
-  </div>
-  <div class="stage-card stage-header stage-5">
-    <div class="stage-icon">⚡</div>
-    <div class="stage-num">STAGE 5</div>
-    <div class="stage-title">算法求解</div>
-  </div>
-  <div class="stage-card stage-header stage-6">
-    <div class="stage-icon">📅</div>
-    <div class="stage-num">STAGE 6</div>
-    <div class="stage-title">人机决策</div>
-  </div>
-  <div class="stage-card stage-header stage-7">
-    <div class="stage-icon">💰</div>
-    <div class="stage-num">STAGE 7</div>
-    <div class="stage-title">价值评估</div>
-  </div>
-</div>
-
-<!-- 理论层 -->
-<div class="framework-row">
-  <div class="row-label" style="background: linear-gradient(135deg, #475569, #64748b);">
-    <div class="num">②</div>理论<br>基础
-  </div>
-  <div class="stage-card stage-1">
-    <div class="theory-content">
-      <b>📚 约束理论 TOC</b>
-      平衡计分卡 BSC<br>
-      多维健康度评估
-      <div class="author">Goldratt 1984<br>Kaplan & Norton 1992</div>
-    </div>
-  </div>
-  <div class="stage-card stage-2">
-    <div class="theory-content">
-      <b>📚 数据治理</b>
-      DMBOK 数据质量<br>
-      6维评估框架
-      <div class="author">DAMA Int'l<br>Liu et al. 2008 (iForest)</div>
-    </div>
-  </div>
-  <div class="stage-card stage-3">
-    <div class="theory-content">
-      <b>📚 整数规划</b>
-      调度问题α|β|γ分类<br>
-      MIP三要素抽象
-      <div class="author">Wolsey 2020<br>Pinedo 2016</div>
-    </div>
-  </div>
-  <div class="stage-card stage-4">
-    <div class="theory-content">
-      <b>📚 统计学习</b>
-      集成学习 + SHAP<br>
-      可解释性公平归因
-      <div class="author">Hastie et al. 2009<br>Lundberg & Lee 2017</div>
-    </div>
-  </div>
-  <div class="stage-card stage-5">
-    <div class="theory-content">
-      <b>📚 元启发式</b>
-      探索-开发权衡<br>
-      GA + SA 混合机制
-      <div class="author">Holland 1975, Glover 1986<br>Kirkpatrick et al. 1983</div>
-    </div>
-  </div>
-  <div class="stage-card stage-6">
-    <div class="theory-content">
-      <b>📚 技术接受 TAM</b>
-      可解释AI（XAI）<br>
-      变革管理八步模型
-      <div class="author">Davis 1989, Kotter 1996<br>Doshi-Velez & Kim 2017</div>
-    </div>
-  </div>
-  <div class="stage-card stage-7">
-    <div class="theory-content">
-      <b>📚 投资评估</b>
-      NPV + 实物期权<br>
-      AHP 决策矩阵
-      <div class="author">Brealey et al., Trigeorgis 1996<br>Saaty 1980</div>
-    </div>
-  </div>
-</div>
-
-<!-- 工具层 -->
-<div class="framework-row">
-  <div class="row-label" style="background: linear-gradient(135deg, #1d4ed8, #2563eb);">
-    <div class="num">③</div>AI<br>Web App
-  </div>
-  <div class="stage-card stage-1">
-    <div class="tool-card">
-      <div class="tool-name">🩺 DiagnosePilot</div>
-      <div class="tool-cn">排产健康度<br>AI 诊断仪表板</div>
-      <div class="tool-fig">图 15</div>
-    </div>
-  </div>
-  <div class="stage-card stage-2">
-    <div class="tool-card">
-      <div class="tool-name">📊 DataPilot</div>
-      <div class="tool-cn">排产数据治理<br>AI 助手</div>
-      <div class="tool-fig">图 12</div>
-    </div>
-  </div>
-  <div class="stage-card stage-3">
-    <div class="tool-card">
-      <div class="tool-name">📐 ModelTutor</div>
-      <div class="tool-cn">AI 运筹建模<br>助教（无需写代码）</div>
-      <div class="tool-fig">图 13</div>
-    </div>
-  </div>
-  <div class="stage-card stage-4">
-    <div class="tool-card">
-      <div class="tool-name">🧠 ParamLab</div>
-      <div class="tool-cn">AI 参数学习<br>实验台</div>
-      <div class="tool-fig">图 16</div>
-    </div>
-  </div>
-  <div class="stage-card stage-5">
-    <div class="tool-card">
-      <div class="tool-name">⚡ AlgoLab</div>
-      <div class="tool-cn">智能优化算法<br>实验台</div>
-      <div class="tool-fig">图 17</div>
-    </div>
-  </div>
-  <div class="stage-card stage-6">
-    <div class="tool-card">
-      <div class="tool-name">📅 SchedulePilot</div>
-      <div class="tool-cn">AI 排产决策<br>智能助手</div>
-      <div class="tool-fig">图 14</div>
-    </div>
-  </div>
-  <div class="stage-card stage-7">
-    <div class="tool-card">
-      <div class="tool-name">💰 ROILab</div>
-      <div class="tool-cn">数据驱动排产<br>ROI 仿真器</div>
-      <div class="tool-fig">图 18</div>
-    </div>
-  </div>
-</div>
-
-<!-- 输出层 -->
-<div class="framework-row">
-  <div class="row-label" style="background: linear-gradient(135deg, #b45309, #d97706);">
-    <div class="num">④</div>核心<br>输出
-  </div>
-  <div class="stage-card stage-1">
-    <div class="output-content">
-      <span class="arrow">▼</span>
-      <b>5维健康度评分</b><br>
-      ROI排序 · 行业对标<br>
-      <span style="color: #dc2626; font-weight: 700;">42/100 严重不健康</span>
-    </div>
-  </div>
-  <div class="stage-card stage-2">
-    <div class="output-content">
-      <span class="arrow">▼</span>
-      <b>高质量结构化数据集</b><br>
-      异常检测 + 特征工程<br>
-      12项业务特征就绪
-    </div>
-  </div>
-  <div class="stage-card stage-3">
-    <div class="output-content">
-      <span class="arrow">▼</span>
-      <b>形式化MIP模型</b><br>
-      4变量·3目标·5约束族<br>
-      自然语言→数学表达
-    </div>
-  </div>
-  <div class="stage-card stage-4">
-    <div class="output-content">
-      <span class="arrow">▼</span>
-      <b>参数矩阵</b> <br>
-      p_ij , s_ijk 含置信区间<br>
-      误差 ±42% → ±9%
-    </div>
-  </div>
-  <div class="stage-card stage-5">
-    <div class="output-content">
-      <span class="arrow">▼</span>
-      <b>近优排产方案</b><br>
-      Cmax↓18% · 延迟↓42%<br>
-      换模↓28% · 8min求解
-    </div>
-  </div>
-  <div class="stage-card stage-6">
-    <div class="output-content">
-      <span class="arrow">▼</span>
-      <b>自然语言报告</b><br>
-      What-If模拟 · 对话答疑<br>
-      算法→人 认知桥梁
-    </div>
-  </div>
-  <div class="stage-card stage-7">
-    <div class="output-content">
-      <span class="arrow">▼</span>
-      <b>NPV / IRR / 决策建议</b><br>
-      自研 vs APS vs 不投<br>
-      <span style="color: #059669; font-weight: 700;">¥186万/年净收益</span>
-    </div>
-  </div>
-</div>
-
-<!-- 闭环箭头 -->
-<div style="margin: 16px 0; text-align: center; position: relative;">
-  <div style="display: inline-block; padding: 8px 18px; background: linear-gradient(90deg, #fef3c7, #fed7aa);
-              border: 2px solid #f59e0b; border-radius: 20px; font-size: 12px; font-weight: 600; color: #b45309;">
-    🔄 ROI仿真结果反馈优化策略 → 形成"诊断-改进-评估"持续闭环
-  </div>
-</div>
-
-<!-- 底部说明 -->
 <div class="footer">
-  <div class="footer-item">
-    <h4>🎓 教学价值定位</h4>
-    <p>
-      <b>MBA层面</b>：以 DiagnosePilot 与 ROILab 为重点，培养"问题诊断 + 决策评估"能力；<br>
-      <b>本科层面</b>：以 DataPilot/ModelTutor/ParamLab/AlgoLab 为重点，培养"建模 + 算法"能力；<br>
-      <b>共用</b>：SchedulePilot 展示人机协同决策。
-    </p>
-  </div>
-  <div class="footer-item">
-    <h4>🔬 理论 - 实践 - 价值 三段式</h4>
-    <p>
-      每个 AI 工具均遵循「<b>经典理论支撑 → AI Web App 实现 → 量化业务价值</b>」的三段式逻辑。
-      避免"为AI而AI"，使学生既知其然又知其所以然，<br>同时看到AI在真实场景的可量化收益。
-    </p>
-  </div>
-  <div class="footer-item">
-    <h4>📚 课程对接</h4>
-    <p>
-      对接第十七届"全国百篇优秀管理案例"采编指南：<br>
-      • <b>运营管理 13-1/13-2</b>（数智时代运营管理）<br>
-      • <b>管理信息系统 8-3</b>（大数据决策）<br>
-      • <b>供应链管理 10-4</b>（AI赋能供应链）
-    </p>
-  </div>
+  © 2026 邹碧攀 · 曹丽莉 · 赵雁 · 中南财经政法大学 工商管理学院 · CC BY-NC-SA 4.0<br>
+  <a href="https://gitee.com/BipanZou/laishiming-case-ai-platform">Gitee 仓库</a> ·
+  <a href="https://github.com/BipanZou/laishiming-case-ai-platform">GitHub 镜像</a> ·
+  <a href="https://bipanzou.github.io/laishiming-case-ai-platform/">在线访问</a>
 </div>
 
+<script>
+'use strict';
+
+const APPS = [
+  {id:'01_DataPilot', name:'DataPilot', cn:'排产数据治理 AI 助手', icon:'📊', stage:'治理', stageColor:'#BF8F00',
+   features:'CSV 拖拽 · 4 异常检测 · 5 填补策略 · AI 特征工程 · 5 维质量评分',
+   audience:'本科 / MBA · 2 学时'},
+  {id:'02_ModelTutor', name:'ModelTutor', cn:'AI 运筹建模助教', icon:'📐', stage:'建模', stageColor:'#385723',
+   features:'8 模板 · α|β|γ 分类 · NL → Pyomo / Gurobi 双代码 · 复杂度分析 · AI 助教',
+   audience:'本科 / MBA · 2 学时'},
+  {id:'03_SchedulePilot', name:'SchedulePilot', cn:'AI 排产决策智能助手', icon:'🎯', stage:'决策', stageColor:'#1F4E79',
+   features:'6 What-If 场景 · 4 方案对比 · 自然语言报告 · AI 对话答疑',
+   audience:'MBA / EMBA · 1 学时'},
+  {id:'04_ParamLab', name:'ParamLab', cn:'AI 参数学习实验台', icon:'📈', stage:'学习', stageColor:'#385723',
+   features:'OLS / Ridge / Lasso / RF · K-fold CV · 正则化路径 · SHAP 解释',
+   audience:'本科 · 2 学时'},
+  {id:'05_AlgoLab', name:'AlgoLab', cn:'智能优化算法实验台', icon:'⚡', stage:'算法', stageColor:'#2E75B6',
+   features:'GA / SA / TS / ALNS · 5 实例 · 22 参数 · 4 算法 Benchmark',
+   audience:'本科 / MBA · 2 学时'},
+  {id:'06_DiagnosePilot', name:'DiagnosePilot', cn:'排产健康度诊断仪表板', icon:'🩺', stage:'诊断', stageColor:'#C00000',
+   features:'5 维健康度 · 3 类对标 · 7 项目 ROI 排序 · TOC 瓶颈识别',
+   audience:'MBA / EMBA · 1 学时'},
+  {id:'07_ROILab', name:'ROILab', cn:'数据驱动排产 ROI 仿真器', icon:'💰', stage:'评估', stageColor:'#7030A0',
+   features:'6 维滑块 · NPV / IRR / Tornado · Monte Carlo 10K · 三方案对比',
+   audience:'MBA / EMBA · 1 学时'},
+];
+
+const THEORIES = [
+  {title:'TOC 约束理论 + BSC 平衡计分卡', app:'DiagnosePilot',
+   desc:'Goldratt 1984 提出约束理论，识别系统瓶颈；Kaplan & Norton 1992 BSC 平衡计分卡 四维度评估。',
+   ref:'Goldratt (1984); Kaplan & Norton (1992)'},
+  {title:'数据治理与质量管理', app:'DataPilot',
+   desc:'孤立森林 Liu (2008); KNN Imputer Troyanskaya (2001); DAMA-DMBOK 数据治理标准。',
+   ref:'Liu et al. (2008); DAMA-DMBOK (2017)'},
+  {title:'整数规划 + α|β|γ 调度分类', app:'ModelTutor',
+   desc:'Graham (1979) α|β|γ 三段分类；Wolsey (2020) 整数规划；Pinedo (2016) 调度理论。',
+   ref:'Graham (1979); Wolsey (2020); Pinedo (2016)'},
+  {title:'统计学习 + 可解释 AI (SHAP)', app:'ParamLab',
+   desc:'Hastie et al. (2009) 统计学习；Hoerl & Kennard (1970) Ridge；Tibshirani (1996) Lasso；Breiman (2001) RF；Lundberg & Lee (2017) SHAP。',
+   ref:'Hastie et al. (2009); Breiman (2001); Lundberg & Lee (2017)'},
+  {title:'元启发式 + 进化计算', app:'AlgoLab',
+   desc:'Holland (1975) GA；Kirkpatrick et al. (1983) SA；Glover (1986) TS；Ropke & Pisinger (2006) ALNS。',
+   ref:'Holland (1975); Kirkpatrick et al. (1983); Glover (1986); Ropke & Pisinger (2006)'},
+  {title:'技术接受 + 可解释 AI', app:'SchedulePilot',
+   desc:'Davis (1989) 技术接受模型 TAM；Kotter (1996) 变革八步法；Doshi-Velez & Kim (2017) 可解释 AI。',
+   ref:'Davis (1989); Kotter (1996); Doshi-Velez & Kim (2017)'},
+  {title:'投资评估 + 实物期权 + AHP', app:'ROILab',
+   desc:'Brealey (2020) 公司理财；Trigeorgis (1996) 实物期权；Saaty (1980) AHP 层次分析法。',
+   ref:'Brealey (2020); Trigeorgis (1996); Saaty (1980)'},
+];
+
+function $(id) { return document.getElementById(id); }
+
+function renderApps() {
+  const c = $('apps-grid');
+  c.innerHTML = '';
+  APPS.forEach((app, i) => {
+    const card = document.createElement('a');
+    card.className = 'app-card';
+    card.href = app.id + '.html';
+    card.innerHTML = `
+      <div class="corner-num">0${i+1}</div>
+      <div class="icon">${app.icon}</div>
+      <h3>
+        ${app.name}
+        <span class="stage" style="background:${app.stageColor}22;color:${app.stageColor};">${app.stage}</span>
+        <span class="ver">v2.0</span>
+      </h3>
+      <div class="full-name">${app.cn}</div>
+      <div class="features">✦ ${app.features}</div>
+      <div class="audience">🎓 ${app.audience}</div>
+      <div class="actions"><span class="btn-go">→ 启动应用</span></div>
+    `;
+    c.appendChild(card);
+  });
+}
+
+function renderTheory() {
+  const c = $('theory-grid');
+  c.innerHTML = '';
+  THEORIES.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'theory-card';
+    card.innerHTML = `
+      <h4>${t.title} <span style="font-size:10px;color:#666;font-weight:normal;">(${t.app})</span></h4>
+      <p>${t.desc}</p>
+      <div class="ref">${t.ref}</div>
+    `;
+    c.appendChild(card);
+  });
+}
+
+function init() {
+  renderApps();
+  renderTheory();
+  // Tab switching
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      $('t-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+  console.log('FrameworkOverview Pro 已初始化');
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
 </body>
 </html>
