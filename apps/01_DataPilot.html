@@ -369,8 +369,8 @@ for each missing point x:
             <div class="chart-wrapper"><canvas id="chart-hist"></canvas></div>
           </div>
           <div>
-            <h4 style="font-size:13px;color:var(--c-primary);margin-bottom:6px;">箱线图（含异常点）</h4>
-            <div class="chart-wrapper"><canvas id="chart-box"></canvas></div>
+            <h4 style="font-size:13px;color:var(--c-primary);margin-bottom:6px;">🎯 异常散点图（红色为检出异常）</h4>
+            <div class="chart-wrapper"><canvas id="chart-scatter"></canvas></div>
           </div>
         </div>
         <table class="algo-table" id="benchmark-table" style="display:none;margin-top:14px;">
@@ -948,7 +948,7 @@ function runDetect() {
 
   $('st-outliers').textContent = state.outlierFlags.filter(Boolean).length;
   drawHistogram(values, field);
-  drawBoxplot(values, field);
+  drawScatter(values, field);
   renderTable(true);
 }
 
@@ -993,37 +993,78 @@ function drawHistogram(values, field) {
   });
 }
 
-function drawBoxplot(values, field) {
-  destroyChart('box');
-  const ctx = $('chart-box').getContext('2d');
-  // 简单 box plot（用 Chart.js scatter 模拟）
-  const nums = values.map((v, i) => ({v: +v, idx: i})).filter(x => !isNaN(x.v)).sort((a, b) => a.v - b.v);
-  if (nums.length === 0) return;
-  const vals = nums.map(x => x.v);
-  const q1 = vals[Math.floor(vals.length * 0.25)];
-  const median = vals[Math.floor(vals.length * 0.5)];
-  const q3 = vals[Math.floor(vals.length * 0.75)];
-  const iqr = q3 - q1;
-  const minWhisker = q1 - 1.5 * iqr;
-  const maxWhisker = q3 + 1.5 * iqr;
+function drawScatter(values, field) {
+  destroyChart('scatter');
+  const canvas = $('chart-scatter');
+  if (!canvas) {
+    console.error('chart-scatter canvas not found');
+    return;
+  }
+  const ctx = canvas.getContext('2d');
+  // 异常散点图：x 轴为行索引、y 轴为值；异常点红色高亮
+  // 计算 Q1/Q3/median 作为参考线
+  const numsAll = values.map((v, i) => ({v: +v, idx: i})).filter(x => !isNaN(x.v));
+  if (numsAll.length === 0) {
+    console.warn('No numeric values to plot');
+    return;
+  }
+  const sorted = [...numsAll.map(x => x.v)].sort((a, b) => a - b);
+  const n = sorted.length;
+  const q1 = sorted[Math.floor(n * 0.25)];
+  const median = sorted[Math.floor(n * 0.5)];
+  const q3 = sorted[Math.floor(n * 0.75)];
+  const mean = sorted.reduce((s, v) => s + v, 0) / n;
+  const std = Math.sqrt(sorted.reduce((s, v) => s + (v - mean) ** 2, 0) / n);
 
-  const datasets = [
-    {label: '正常点', data: nums.filter(x => !state.outlierFlags[x.idx]).map(x => ({x: 1 + (Math.random() - 0.5) * 0.3, y: x.v})), backgroundColor: '#1F4E79AA', pointRadius: 2},
-    {label: '异常点', data: nums.filter(x => state.outlierFlags[x.idx]).map(x => ({x: 1 + (Math.random() - 0.5) * 0.3, y: x.v})), backgroundColor: '#C00000', pointRadius: 4},
-  ];
-  charts.box = new Chart(ctx, {
+  // 拆为正常 / 异常两组散点（用 idx 作为 x）
+  const normalPoints = numsAll.filter(x => !state.outlierFlags[x.idx]).map(x => ({x: x.idx, y: x.v}));
+  const outlierPoints = numsAll.filter(x => state.outlierFlags[x.idx]).map(x => ({x: x.idx, y: x.v}));
+
+  // 抽样：如果数据量 > 2000，下采样到 2000 以保证渲染性能
+  let normalSampled = normalPoints, outlierSampled = outlierPoints;
+  if (normalPoints.length > 2000) {
+    const step = Math.ceil(normalPoints.length / 2000);
+    normalSampled = normalPoints.filter((_, i) => i % step === 0);
+  }
+
+  // 参考线（中位数、Q1、Q3、±3σ）作为额外的 line 数据集
+  const maxX = values.length;
+  const refLine = (val, label, color, dash = []) => ({
+    label, type: 'line', data: [{x: 0, y: val}, {x: maxX, y: val}],
+    borderColor: color, borderWidth: dash.length ? 1 : 1.5, borderDash: dash, pointRadius: 0, fill: false,
+  });
+
+  charts.scatter = new Chart(ctx, {
     type: 'scatter',
-    data: { datasets },
+    data: {
+      datasets: [
+        {label: `正常 (${normalSampled.length})`, data: normalSampled,
+         backgroundColor: 'rgba(31,78,121,0.45)', pointRadius: 2.5, pointHoverRadius: 5},
+        {label: `异常 (${outlierPoints.length})`, data: outlierSampled,
+         backgroundColor: '#C00000', borderColor: '#660000', pointRadius: 4, pointHoverRadius: 7},
+        refLine(median, `中位数 ${median.toFixed(2)}`, '#385723'),
+        refLine(q1, `Q1 ${q1.toFixed(2)}`, '#888', [4, 3]),
+        refLine(q3, `Q3 ${q3.toFixed(2)}`, '#888', [4, 3]),
+        refLine(mean + 3 * std, `+3σ ${(mean + 3 * std).toFixed(2)}`, '#C00000', [2, 2]),
+        refLine(Math.max(0, mean - 3 * std), `-3σ`, '#C00000', [2, 2]),
+      ]
+    },
     options: {
       responsive: true, maintainAspectRatio: false, animation: false,
-      scales: { x: { display: false, min: 0, max: 2 }, y: { title: { display: true, text: field } } },
+      scales: {
+        x: {title: {display: true, text: '行索引'}, type: 'linear', position: 'bottom'},
+        y: {title: {display: true, text: field}}
+      },
       plugins: {
-        legend: { position: 'top' },
-        annotation: {
-          annotations: {
-            q1: { type: 'line', yMin: q1, yMax: q1, borderColor: '#385723', borderWidth: 1 },
-            median: { type: 'line', yMin: median, yMax: median, borderColor: '#385723', borderWidth: 2 },
-            q3: { type: 'line', yMin: q3, yMax: q3, borderColor: '#385723', borderWidth: 1 }
+        legend: {position: 'top', labels: {font: {size: 10}, boxWidth: 16}},
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              if (ctx.dataset.type === 'line') return ctx.dataset.label;
+              const row = state.data[ctx.parsed.x];
+              const id = row?.order_id || row?.[state.columns[0]] || `#${ctx.parsed.x}`;
+              return `${id}: ${field}=${ctx.parsed.y.toFixed(2)}`;
+            }
           }
         }
       }
@@ -1491,6 +1532,44 @@ function showToast(msg) {
 // =====================================================
 // 12) 初始化
 // =====================================================
+// 真实 CSV 文件名映射
+const CSV_FILE_MAP = {
+  work_orders: 'work_orders.csv',
+  machines: 'machines.csv',
+  products: 'products.csv',
+  customers: 'customers.csv',
+  changeovers: 'changeovers.csv',
+  deliveries: 'deliveries.csv',
+  quality: 'quality_inspections.csv'
+};
+
+async function loadBuiltinDataset(id, name, chip) {
+  // 先尝试 fetch 真实 CSV（部署在 ../datasets/ 目录下）
+  const fileName = CSV_FILE_MAP[id];
+  if (fileName) {
+    try {
+      log(`正在加载真实数据集 ${fileName} ...`);
+      const url = `../datasets/${fileName}`;
+      const resp = await fetch(url);
+      if (resp.ok) {
+        const text = await resp.text();
+        const data = parseCSV(text);
+        if (data && data.length > 0) {
+          loadDataset(data, `${name}（真实数据）`);
+          log(`✅ 真实数据加载成功（${data.length} 行）`, 'success');
+          return;
+        }
+      }
+      log(`⚠ 未找到 ${url}，回退到模拟数据`, 'warn');
+    } catch (e) {
+      log(`⚠ 网络/路径不可用（${e.message}），回退到模拟数据`, 'warn');
+    }
+  }
+  // 回退：用 JS 生成模拟数据
+  const data = generateBuiltin(id);
+  loadDataset(data, name + '（模拟数据）');
+}
+
 function init() {
   // 内嵌数据集 chips
   const chipsContainer = $('ds-chips');
@@ -1498,11 +1577,10 @@ function init() {
     const chip = document.createElement('button');
     chip.className = 'ds-chip';
     chip.innerHTML = `${ds.name} <span class="count">${ds.hint}</span>`;
-    chip.addEventListener('click', () => {
+    chip.addEventListener('click', async () => {
       document.querySelectorAll('.ds-chip').forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
-      const data = generateBuiltin(ds.id);
-      loadDataset(data, ds.name);
+      await loadBuiltinDataset(ds.id, ds.name, chip);
     });
     chipsContainer.appendChild(chip);
   });
