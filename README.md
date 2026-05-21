@@ -1,170 +1,149 @@
-# 数据驱动注塑排产优化 · AI 教学平台
+# 莱势明 AI 排产教学平台 · 完整配套资源 v2.0
 
-**Data-Driven Injection Molding Scheduling: An AI-Empowered Teaching Platform**
+> **AI 赋能数据驱动的注塑排产优化** — 7 个真实可运行的 AI Web 应用 + 57 万行真实业务数据 + 完整教学文档体系
 
 [![License: CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-[![Status: Active](https://img.shields.io/badge/status-active-brightgreen)]()
-[![Apps: 7](https://img.shields.io/badge/AI%20Apps-7-blue)]()
+[![Status: v2.0](https://img.shields.io/badge/version-v2.0-blue)]()
+[![Apps: 7](https://img.shields.io/badge/AI%20Apps-7-green)]()
+[![Data: 572K rows](https://img.shields.io/badge/dataset-572,505%20rows-orange)]()
 [![Offline: Yes](https://img.shields.io/badge/offline-supported-success)]()
 
 ---
 
-## 📖 项目简介 / Project Overview
+## 📦 资源清单
 
-本仓库是教学案例**「数据驱动注塑排产优化：莱势明汽车饰件的智能制造实践」**的配套教学支持材料，包含 **7 个真实可运行的 AI Web 应用工具**，覆盖案例从"问题诊断"到"价值评估"的完整教学链条。
-
-This repository hosts the supplementary teaching materials for the case **"Data-Driven Injection Molding Scheduling: The AI-Empowered Smart Manufacturing Practice at Laishiming"**, featuring **7 fully functional AI Web applications** that span the entire teaching chain from "problem diagnosis" to "value evaluation".
-
-### 🎯 核心特色 / Key Features
-
-- ✅ **7 个真实可运行的 AI Web App**，无需安装、双击即开
-- ✅ **完全离线可用**（Chart.js 已本地化）
-- ✅ **完整教学链条**：诊断 → 数据 → 建模 → 学习 → 算法 → 决策 → 评估
-- ✅ **AI 赋能教学**：LLM、机器学习、可解释 AI、AI 智能体全栈应用
-- ✅ **MBA / 本科生双层教学**适配
-- ✅ **中文界面**，专为中国管理学课堂优化
+| 目录 | 内容 | 数量 | 大小 |
+|---|---|---|---|
+| `apps/` | 7 个 AI Web 应用（HTML 单文件，断网可用） | 8 个 HTML | ~5.9 MB |
+| `datasets/` | 14 张莱势明业务数据表（CSV） | 14 个 CSV | ~42 MB |
+| `docs/app_manuals/` | 7 份独立 App 使用手册（PDF） | 7 个 PDF | ~1.7 MB |
+| `notebooks/` | Python Notebook 等效代码 | 6 个 .ipynb | ~50 KB |
+| `prompts/` | 教学型提示词全集 + 开发记录 | 11 个 MD | ~40 KB |
+| `lib/` | Chart.js v4.4.7 离线版 | 1 个 JS | ~205 KB |
+| `index.html` | 平台总览入口（双击启动） | 1 个 HTML | ~14 KB |
+| **总计** | | **~50 个文件** | **~50 MB** |
 
 ---
 
-## 🚀 快速开始 / Quick Start
+## 🎯 七大 AI Web 应用（覆盖完整教学链条）
 
-### 在线体验（推荐）/ Try Online
+| 序 | 阶段 | 应用 | 中文名 | 核心功能 | 版本 |
+|---|---|---|---|---|---|
+| 1 | 📊 治理 | **DataPilot** | 排产数据治理 AI 助手 | CSV 拖拽 · 4 异常算法 · 5 填补策略 | v1.0 |
+| 2 | 📐 建模 | **ModelTutor** | AI 运筹建模助教 | 自然语言 → α\|β\|γ → Pyomo / Gurobi 双代码 | **v2.0 Pro** |
+| 3 | 🎯 决策 | **SchedulePilot** | AI 排产决策智能助手 | 6 What-If 场景 · 4 方案对比 · 自然语言报告 | **v2.0 Pro** |
+| 4 | 📈 学习 | **ParamLab** | AI 参数学习实验台 | OLS / Ridge / Lasso / RF + SHAP | **v2.0 Pro** |
+| 5 | ⚡ 算法 | **AlgoLab** | 智能优化算法实验台 | GA / SA / TS / ALNS + 5 实例 | **v2.0 Pro** |
+| 6 | 🩺 诊断 | **DiagnosePilot** | 排产健康度 AI 诊断仪表板 | 5 维健康度 · 3 类对标 · 7 ROI 排序 | **v2.0 Pro** |
+| 7 | 💰 评估 | **ROILab** | 数据驱动排产 ROI 仿真器 | NPV / IRR / Tornado / Monte Carlo 10K | **v2.0 Pro** |
 
-访问 **GitHub Pages**：[https://bipanzou.github.io/laishiming-case-ai-platform/](https://bipanzou.github.io/laishiming-case-ai-platform/)
+---
 
-直接在浏览器中打开 7 个 AI App 的总览页，点击任一卡片即可体验。
+## 📊 14 张莱势明业务数据表（共 572,505 行）
 
-### 本地运行 / Run Locally
+| # | 文件 | 行数 | 内容 |
+|---|---|---|---|
+| 1 | `machines.csv` | 29 | 29 台异构注塑机基础属性 |
+| 2 | `products.csv` | 293 | 产品 SKU 主数据 |
+| 3 | `customers.csv` | 20 | Tier 1 + 整车厂客户 |
+| 4 | `operators.csv` | 48 | 操作员主数据 |
+| 5 | `work_orders.csv` | **50,000** | 28 个月历史工单 |
+| 6 | `machine_daily_logs.csv` | **200,000** | 30 分钟级设备日志 |
+| 7 | `changeovers.csv` | 49,382 | 换模记录 |
+| 8 | `deliveries.csv` | 30,000 | 客户交付记录 |
+| 9 | `quality_inspections.csv` | 60,000 | 质量检验记录 |
+| 10 | `material_consumption.csv` | 45,000 | 物料消耗记录 |
+| 11 | `energy_logs.csv` | 73,950 | 能耗日志 |
+| 12 | `operator_shifts.csv` | 40,783 | 操作员班次出勤 |
+| 13 | `maintenance_events.csv` | 8,000 | 设备维修事件 |
+| 14 | `inventory_snapshots.csv` | 15,000 | 库存日快照 |
 
-**方法 1：克隆仓库**
+---
+
+## 🚀 快速开始
+
+### 方法 1：本地双击启动（推荐）
 ```bash
-git clone https://github.com/BipanZou/laishiming-case-ai-platform.git
-cd laishiming-case-ai-platform
-# 双击 index.html
+1. 解压本资源 ZIP 到任意目录
+2. 双击 index.html → 平台总览页打开
+3. 点击任一应用卡片即可启动对应 AI Web 应用
 ```
 
-**方法 2：直接下载 ZIP**
+### 方法 2：在线访问
+- **Gitee Pages（主线）**：https://gitee.com/BipanZou/laishiming-case-ai-platform
+- **GitHub Pages（镜像）**：https://bipanzou.github.io/laishiming-case-ai-platform/
 
-点击 GitHub 页面右上角 `Code` → `Download ZIP` → 解压后双击 `index.html`
-
----
-
-## 🛠️ 七个 AI Web 应用 / Seven AI Web Apps
-
-| 序 | 阶段 | 应用 | 中文名 | 核心功能 |
-|---|---|---|---|---|
-| 1 | 🩺 诊断 | **DiagnosePilot** | 排产健康度AI诊断仪表板 | 5 维健康度评分 · 行业对标 · ROI 排序 |
-| 2 | 📊 数据治理 | **DataPilot** | 排产数据治理AI助手 | 孤立森林异常检测 · KNN/GAN 补全 · LLM 特征工程 |
-| 3 | 📐 数学建模 | **ModelTutor** | AI 运筹建模助教 | 自然语言→MIP 模型 · 对话式学习 · 无需写代码 |
-| 4 | 🧠 参数学习 | **ParamLab** | AI 参数学习实验台 | 三方法估计对比 · SHAP 可解释性 · 全企业回测 |
-| 5 | ⚡ 算法求解 | **AlgoLab** | 智能优化算法实验台 | 实时演化 · 超参数调优 · 4 种算法对比 |
-| 6 | 📅 人机决策 | **SchedulePilot** | AI 排产决策智能助手 | 自然语言报告 · What-If 模拟 · 对话答疑 |
-| 7 | 💰 价值评估 | **ROILab** | 数据驱动排产 ROI 仿真器 | 6 维 ROI 滑块 · 三方案 NPV · 敏感性分析 |
-
-> 此外还包含一张 **AI 教学框架全景图**（`00_FrameworkOverview.html`），呈现 7 个工具的完整逻辑链与理论基础。
-
----
-
-## 📁 仓库结构 / Repository Structure
-
-```
-laishiming-case-ai-platform/
-├── README.md                    本文件
-├── LICENSE                      CC BY-NC-SA 4.0
-├── 0_使用说明_必读.txt          中文使用说明
-├── index.html                   ⭐ 总览入口页（双击启动）
-├── apps/                        7 个 AI Web 应用
-│   ├── 00_FrameworkOverview.html
-│   ├── 01_DataPilot.html
-│   ├── 02_ModelTutor.html
-│   ├── 03_SchedulePilot.html
-│   ├── 04_ParamLab.html
-│   ├── 05_AlgoLab.html
-│   ├── 06_DiagnosePilot.html
-│   └── 07_ROILab.html
-├── lib/
-│   └── chart.min.js             Chart.js 离线版（可视化依赖）
-└── screenshots/                 各 App 静态截图
+### 方法 3：用 Python Notebook
+```bash
+cd notebooks/
+jupyter notebook
+# 打开任一 .ipynb 文件，按顺序运行单元格
 ```
 
 ---
 
-## 🎓 教学场景设计 / Teaching Scenarios
+## 📚 完整文档体系
 
-### MBA / EMBA 课堂建议（90 分钟）
+### A. 每个 App 的独立使用手册（PDF）
+`docs/app_manuals/` 目录下有 7 份 PDF 手册，每份覆盖：
+- 应用简介与版本信息
+- 安装与启动步骤
+- 核心功能清单（表格化）
+- 详细使用步骤
+- 参数详解
+- 理论基础与参考文献
+- 教学场景设计（MBA + 本科）
+- 常见问题 FAQ
+- 扩展开发指南
 
-| 时段 | 环节 | 推荐 App |
-|---|---|---|
-| 0~10 min | 案例导入与痛点分析 | **DiagnosePilot** |
-| 10~25 min | 数据治理与特征工程 | **DataPilot** |
-| 25~45 min | 数学建模与对话式学习 | **ModelTutor** |
-| 45~65 min | 参数学习与算法求解 | **ParamLab + AlgoLab** |
-| 65~80 min | 人机协同决策 | **SchedulePilot** |
-| 80~90 min | 商业价值评估 | **ROILab** |
+### B. Python Notebook 等效代码（`notebooks/`）
+6 份 Jupyter Notebook，对应 5 个核心算法应用 + 1 份数据探索：
+- `00_数据探索_14张业务表.ipynb` — 数据集深度探索
+- `01_DataPilot_数据治理.ipynb` — 4 异常 + 5 填补 + 5 维质量评分
+- `02_ModelTutor_Pyomo完整实现.ipynb` — Pyomo R\|\|Cmax 求解
+- `04_ParamLab_完整Python实现.ipynb` — OLS / Ridge / Lasso / RF + SHAP
+- `05_AlgoLab_元启发式Python实现.ipynb` — GA / SA / TS / ALNS
+- `07_ROILab_NPV与MonteCarlo.ipynb` — NPV / IRR / Tornado / Monte Carlo
 
-### 本科生重点
-
-聚焦 **DataPilot / ModelTutor / ParamLab / AlgoLab**，培养"数据 + 建模 + 算法"硬核能力。
-
-### MBA 学员重点
-
-聚焦 **DiagnosePilot / SchedulePilot / ROILab**，培养"诊断 + 决策 + 评估"管理能力。
-
----
-
-## 🔬 理论基础 / Theoretical Foundation
-
-每个 AI Web App 均建立在经典理论之上：
-
-| App | 核心理论 | 代表文献 |
-|---|---|---|
-| DiagnosePilot | 约束理论 TOC + 平衡计分卡 BSC | Goldratt 1984 / Kaplan & Norton 1992 |
-| DataPilot | 数据驱动决策 + 数据治理 | Bertsimas & Kallus 2020 / DAMA-DMBOK |
-| ModelTutor | 整数规划 + α\|β\|γ 调度分类 | Wolsey 2020 / Pinedo 2016 |
-| ParamLab | 统计学习 + SHAP 可解释性 | Hastie et al. 2009 / Lundberg & Lee 2017 |
-| AlgoLab | 进化计算 + 模拟退火 | Holland 1975 / Kirkpatrick 1983 / Glover 1986 |
-| SchedulePilot | 技术接受 TAM + 可解释 AI | Davis 1989 / Kotter 1996 / Doshi-Velez 2017 |
-| ROILab | NPV + 实物期权 + AHP | Brealey 2020 / Trigeorgis 1996 / Saaty 1980 |
+### C. 提示词全集（`prompts/`）
+11 份 Markdown 文档：
+- `99_六段式模板说明.md` — "角色—任务—约束—示例—输出格式—反思"通用模板
+- `01-07_*_主提示词.md` — 7 个应用的完整提示词（可直接复用）
+- `_开发记录.md` — 项目完整开发时间线与团队分工
 
 ---
 
-## 📚 课程对接 / Course Alignment
+## 🛠 技术栈
 
-本平台对接中国管理案例共享中心《**第十七届"全国百篇优秀管理案例"评选案例采编指南**》中：
-
-- **运营管理 13-1**：数智时代的运营管理战略与创新
-- **运营管理 13-2**：数智运营
-- **管理信息系统与数智化转型 8-3**：大数据驱动的管理决策
-- **供应链管理 10-4**：AI 赋能供应链创新
-
-适用于以下课程：
-
-- 《数智时代下的智能决策优化》（MBA）
-- 《运营管理》《供应链管理》（本科）
-- 《运筹学》《管理科学》（本科）
-- 《数据科学与商业决策》（MBA / 本科）
-
----
-
-## 💻 技术栈 / Tech Stack
-
-- **前端**：Pure HTML5 + CSS3 + Vanilla JavaScript（无框架依赖）
-- **可视化**：[Chart.js v4.4.7](https://www.chartjs.org/)（已本地化）
-- **设计**：响应式布局，支持桌面/平板/手机访问
+- **前端框架**：Pure HTML5 + CSS3 + Vanilla JavaScript（无框架依赖）
+- **可视化**：Chart.js v4.4.7（已本地化）
+- **大模型**：DeepSeek-V3 / 通义千问 Qwen2.5-Max / 智谱 GLM-4 Plus
+- **AI 编程助手**：通义灵码 / 字节 Trae / 腾讯 CodeBuddy
+- **代码托管**：Gitee（主线）+ GitHub（镜像）
 - **离线**：所有依赖本地化，断网完全可用
 
 ---
 
-## 📜 引用 / Citation
+## 🎓 教学场景
 
-如果您在教学或研究中使用了本平台，请引用：
+### MBA / EMBA 课堂（90 分钟）
+| 时段 | 环节 | 应用 |
+|---|---|---|
+| 0–10 min | 案例导入 | DiagnosePilot |
+| 10–25 min | 数据治理 | DataPilot |
+| 25–45 min | 数学建模 | ModelTutor |
+| 45–65 min | 参数学习 | ParamLab + AlgoLab |
+| 65–80 min | 人机决策 | SchedulePilot |
+| 80–90 min | 商业评估 | ROILab |
 
-**APA 格式：**
-> 邹碧攀, 曹丽莉, 赵雁. (2026). 数据驱动注塑排产优化：莱势明汽车饰件的智能制造实践 [教学案例]. 中南财经政法大学工商管理学院 管理案例研究中心.
->
-> Zou, B., Cao, L., & Zhao, Y. (2026). *Data-Driven Injection Molding Scheduling: The AI-Empowered Smart Manufacturing Practice at Laishiming* [Teaching case & companion AI platform]. School of Business Administration, Zhongnan University of Economics and Law.
+### 本科课堂（4 学时课堂 + 4 学时实验）
+- 重点应用：DataPilot / ModelTutor / ParamLab / AlgoLab（4 个偏技术）
+- 实验作业：Pyomo 代码、4 算法 Benchmark、Python Notebook 复现
 
-**BibTeX：**
+---
+
+## 📜 引用
+
 ```bibtex
 @misc{zou2026laishiming,
   author       = {Zou, Bipan and Cao, Lili and Zhao, Yan},
@@ -178,10 +157,9 @@ laishiming-case-ai-platform/
 
 ---
 
-## 📄 版权许可 / License
+## 📄 版权许可
 
-本项目采用 **[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)** 协议（署名 - 非商业 - 相同方式共享）。
-
+本项目采用 **[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)** 协议
 - ✅ 教学使用：完全免费
 - ✅ 学术研究：完全免费（请引用）
 - ✅ 二次开发：允许（需相同协议共享）
@@ -189,31 +167,14 @@ laishiming-case-ai-platform/
 
 ---
 
-## 🤝 致谢 / Acknowledgements
-
-- 本平台是 **2026 年中南财经政法大学工商管理学院管理案例研究中心立项项目** 成果
-- 感谢 **武汉莱势明汽车饰件有限公司** 对案例研究的全面支持
-- 感谢中国管理案例共享中心提供的案例采编规范指引
-- 感谢所有参与案例开发与平台建设的师生
-
----
-
-## 📮 联系方式 / Contact
+## 📮 联系方式
 
 | 项目负责人 | 邮箱 | 单位 |
 |---|---|---|
 | **邹碧攀**（Bipan Zou）| bipanzou@zuel.edu.cn | 中南财经政法大学工商管理学院 |
 
-如在使用中遇到问题、有改进建议或希望合作开发，欢迎邮件联系。
+**团队成员**：邹碧攀（教授）· 曹丽莉（副教授）· 赵雁（副教授）
 
 ---
 
-<div align="center">
-
-**🌟 如果本平台对您的教学/研究有帮助，欢迎给一个 Star 支持！**
-
-Made with ❤️ for AI-Empowered Management Education
-
-© 2026 邹碧攀 等 · 中南财经政法大学工商管理学院
-
-</div>
+© 2026 邹碧攀 等 · 中南财经政法大学工商管理学院 · CC BY-NC-SA 4.0
